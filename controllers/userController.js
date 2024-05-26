@@ -3,8 +3,10 @@ const { z } = require('zod');
 const prisma = new PrismaClient();
 
 const userSchema = z.object({
-  name: z.string(),
-  email: z.string().email(),
+  name: z.string()
+    .min(3, { message: "O nome deve ter pelo menos 3 letras" })
+    .regex(/^[A-Za-z]+$/, { message: "O nome deve conter apenas letras" }),
+  email: z.string().email({ message: "Email inválido" }),
 });
 
 exports.getUsers = async (req, res) => {
@@ -20,7 +22,7 @@ exports.createUser = async (req, res) => {
     });
     res.status(201).json(newUser);
   } catch (e) {
-    res.status(400).json(e.errors);
+    res.status(400).json({ errors: e.errors });
   }
 };
 
@@ -33,7 +35,7 @@ exports.updateUser = async (req, res) => {
     });
     res.json(updatedUser);
   } catch (e) {
-    res.status(400).json(e.errors);
+    res.status(400).json({ errors: e.errors });
   }
 };
 
